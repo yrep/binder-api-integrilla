@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: Binder API for Integrilla
+  version: 0.1.0
+  description: |
+    API for managing vendors and binds
+  contact:
+    name: Binder Team
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication
+    RefererAuth:
+      type: apiKey
+      in: header
+      name: Referer
+      description: |
+        *Must contain whitelisted domain for API access.*
+        Example: https://trusted-api-client.com/
+
+security:
+  - RefererAuth: []
+  - ApiKeyAuth: []
+
+servers:
+  - url: https://bapi88.apitter.com/api/v1
+    description: Binder production server
+
+paths:
+  /int/getVendors:
+    get:
+      summary: Get vendors
+      description: |
+        Returns a list of vendors. Can be filtered by login or use pagination 
+        through limit and offset parameters. Either login or both limit/offset must be provided.
+      operationId: getVendors
+      tags:
+        - Vendors
+      parameters:
+        - name: login
+          in: query
+          description: |
+              Filter by vendor login. 
+              *Required when limit and offset are not provided*
+          required: false
+          schema:
+            type: string
+            example: "login777"
+        - name: limit
+          in: query
+          description: Maximum number of records to return
+              *Required when login is not provided*
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: -
+            example: 10
+        - name: offset
+          in: query
+          description: Number of records to skip for pagination
+              *Required when login is not provided*
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            example: 0
+      responses:
+        '200':
+          description: Successfully retrieved vendors list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        type:
+                          type: string
+                          example: "touchapi"
+                        login:
+                          type: string
+                          example: "login777"
+                        source:
+                          type: string
+                          example: "whatsapp"
+                  message:
+                    type: string
+                    example: "Vendors received"
+        '400':
+          description: Bad request - invalid or missing parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["limit and offset are required without login parameter"]
+                  message:
+                    type: string
+                    example: "Failed to get vendors"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Unexpected error occurred", "Database connection failed"]
+                  message:
+                    type: string
+                    example: "Failed to get vendors"
+      x-codeSamples:
+        - lang: curl
+          label: cURL Example
+          source: |
+            curl -X GET "https://bapi88.apitter.com/v1/int/getVendors?limit=10&offset=0"
+            -H "Accept: application/json"
+            -H "X-Api-Key: secret"
+            -H "Referer: https://somedomain.com/"
