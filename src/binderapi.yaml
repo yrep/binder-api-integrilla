@@ -1344,6 +1344,10 @@ paths:
                     - domain.bitrix24.ru
                     - domain.bitrix24.com
                   example: "autotaz.amocrm.ru"
+                crm_type:
+                  type: string
+                  description: Required when type cannot be derived from url
+                  example: "bitrix24"
                 crm_token:
                   type: string
                   description: Authentication token for the CRM system
@@ -1367,7 +1371,6 @@ paths:
                 - touchapi_token
                 - touchapi_login
                 - crm_url
-                - crm_token
       responses:
         '200':
           description: Successfully connected vendors
