@@ -19,7 +19,7 @@ components:
       in: header
       name: Referer
       description: |
-        *Must contain whitelisted domain for API access.*
+        *Must contain whitelisted domain for API access. Provide domain before use.*
         Example: https://trusted-api-client.com/
 
 security:
