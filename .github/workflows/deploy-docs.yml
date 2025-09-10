@@ -10,6 +10,9 @@ on:
     paths-ignore: 
       - '.github/workflows/**'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy-docs:
     runs-on: ubuntu-latest
