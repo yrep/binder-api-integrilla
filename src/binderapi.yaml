@@ -44,26 +44,28 @@ paths:
         - name: login
           in: query
           description: |
-              Filter by vendor login. 
-              *Required when limit and offset are not provided*
+            Filter by vendor login. 
+            *Required when limit and offset are not provided*
           required: false
           schema:
             type: string
             example: "login777"
         - name: limit
           in: query
-          description: Maximum number of records to return
-              *Required when login is not provided*
+          description: |
+            Maximum number of records to return
+            *Required when login is not provided*
           required: false
           schema:
             type: integer
             minimum: 1
-            maximum: -
+            maximum: 100  # ЗАМЕНИТЕ "-" на конкретное число
             example: 10
         - name: offset
           in: query
-          description: Number of records to skip for pagination
-              *Required when login is not provided*
+          description: |
+            Number of records to skip for pagination
+            *Required when login is not provided*
           required: false
           schema:
             type: integer
@@ -140,7 +142,7 @@ paths:
         - lang: curl
           label: cURL Example
           source: |
-            curl -X GET "https://bapi88.apitter.com/v1/int/getVendors?limit=10&offset=0"
-            -H "Accept: application/json"
-            -H "X-Api-Key: secret"
+            curl -X GET "https://bapi88.apitter.com/api/v1/int/getVendors?limit=10&offset=0" \
+            -H "Accept: application/json" \
+            -H "X-API-Key: secret" \
             -H "Referer: https://somedomain.com/"
