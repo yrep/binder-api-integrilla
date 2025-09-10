@@ -31,11 +31,122 @@ servers:
     description: Binder production server
 
 paths:
+  /int/addVendor:
+    post:
+      summary: Add new vendor
+      description: |
+        Creates a new vendor in the system. Requires vendor type and additional vendor-specific parameters.
+      operationId: addVendor
+      tags:
+        - Vendors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  description: Vendor type identifier
+                  example: "touchapi"
+                login:
+                  type: string
+                  description: Vendor login identifier
+                  example: "login777"
+                source:
+                  type: string
+                  description: Communication source
+                  example: "whatsapp"
+              example:
+                type: "touchapi"
+                login: "login777"
+                source: "whatsapp"
+      responses:
+        '200':
+          description: Vendor successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    description: Vendor creation results
+                    properties:
+                      ok:
+                        type: boolean
+                        example: true
+                      vendor_id:
+                        type: integer
+                        example: 123
+                      message:
+                        type: string
+                        example: "Vendor created successfully"
+                  message:
+                    type: string
+                    example: "Vendor has been added"
+        '400':
+          description: Bad request - missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Type is required", "Invalid credentials format"]
+                  message:
+                    type: string
+                    example: "Failed to add vendor"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Database connection failed", "Vendor service unavailable"]
+                  message:
+                    type: string
+                    example: "Failed to add vendor"
+      x-codeSamples:
+        - lang: curl
+          label: cURL Example
+          source: |
+            curl -X POST "https://bapi88.apitter.com/api/v1/int/addVendor" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -H "X-API-Key: secret" \
+            -H "Referer: https://somedomain.com/" \
+            -d '{
+              "type": "touchapi",
+              "login": "login777",
+              "source": "whatsapp",
+            }'
+
   /int/getVendors:
     get:
       summary: Get vendors
       description: |
-        Returns a list of vendors. Can be filtered by login or use pagination 
+        Returns a list of vendors. Can be filtered by login or use pagination
         through limit and offset parameters. Either login or both limit/offset must be provided.
       operationId: getVendors
       tags:
@@ -44,7 +155,7 @@ paths:
         - name: login
           in: query
           description: |
-            Filter by vendor login. 
+            Filter by vendor login.
             *Required when limit and offset are not provided*
           required: false
           schema:
@@ -143,6 +254,103 @@ paths:
           label: cURL Example
           source: |
             curl -X GET "https://bapi88.apitter.com/api/v1/int/getVendors?limit=10&offset=0" \
+            -H "Accept: application/json" \
+            -H "X-API-Key: secret" \
+            -H "Referer: https://somedomain.com/"
+
+  /int/deleteVendor:
+    delete:
+      summary: Delete vendor
+      description: |
+        Deletes a vendor by UUID. Also removes all bindings associated with this vendor.
+      operationId: deleteVendor
+      tags:
+        - Vendors
+      parameters:
+        - name: uuid
+          in: query
+          description: Vendor UUID to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: Vendor successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    description: Result of deletion operation
+                  message:
+                    type: string
+                    example: "Vendors has been deleted"
+        '400':
+          description: Bad request - missing UUID parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Vendor uuid required"]
+                  message:
+                    type: string
+                    example: "Failed to delete vendor"
+        '404':
+          description: Vendor not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Vendor not found"]
+                  message:
+                    type: string
+                    example: "Failed to delete vendor"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Unexpected error", "Database connection failed"]
+                  message:
+                    type: string
+                    example: "Failed to delete vendor"
+      x-codeSamples:
+        - lang: curl
+          label: cURL Example
+          source: |
+            curl -X DELETE "https://bapi88.apitter.com/api/v1/int/deleteVendor?uuid=550e8400-e29b-41d4-a716-446655440000" \
             -H "Accept: application/json" \
             -H "X-API-Key: secret" \
             -H "Referer: https://somedomain.com/"
